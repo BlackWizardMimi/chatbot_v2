@@ -425,20 +425,15 @@ class ChatController extends Controller
     private function callLlamaAPI($message)
     {
         try {
-            $response = Http::timeout(1000)->post("http://127.0.0.1:11434/api/generate", [
-                "model" => "llama3",
-                "prompt" => $prompt,
-                "stream" => false // important → get full JSON, not streaming chunks
+            $response = Http::post('http://localhost:11434/api/generate', [
+                'model' => 'llama3',
+                'prompt' => $message,
+                'stream' => false
             ]);
-
-            if ($response->successful()) {
-                $data = $response->json();
-                return $data['response'] ?? "I don't understand.";
-            }
-
-            return "Error: AI service did not respond.";
+            
+            return $response->json()['response'] ?? 'No response from LLaMA';
         } catch (\Exception $e) {
-            return "Error: " . $e->getMessage();
+            return 'Error connecting to LLaMA: ' . $e->getMessage();
         }
         
         
